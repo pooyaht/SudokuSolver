@@ -1,4 +1,4 @@
-package sudokusolver
+package solver
 
 import (
 	"math"
@@ -78,7 +78,7 @@ func (ss SudokuSolver) GetBoard() SudokuBoard {
 	return ss.board
 }
 
-func (ss *SudokuSolver) ReducePossibleValues(cell Cell, value int) {
+func (ss *SudokuSolver) reducePossibleValues(cell Cell, value int) {
 	// remove from same column
 	for _, row := range ss.board {
 		if row[cell.column].row != cell.row {
