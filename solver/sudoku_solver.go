@@ -13,16 +13,16 @@ type SudokuSolver struct {
 type SudokuBoard [][]Cell
 
 type Cell struct {
-	Value          int
-	PossibleValues []int
-	Row            int
-	Column         int
+	value          int
+	possibleValues []int
+	row            int
+	column         int
 }
 
 func (c *Cell) removeValue(value int) {
-	for i, v := range c.PossibleValues {
+	for i, v := range c.possibleValues {
 		if v == value {
-			c.PossibleValues = append(c.PossibleValues[:i], c.PossibleValues[i+1:]...)
+			c.possibleValues = append(c.possibleValues[:i], c.possibleValues[i+1:]...)
 			break
 		}
 	}
@@ -64,10 +64,10 @@ func convertBoardToCells(board [][]int) SudokuBoard {
 				}
 			}
 			sudokuBoard[rowIndex][colIndex] = Cell{
-				Value:          value,
-				PossibleValues: possibleValues,
-				Row:            rowIndex,
-				Column:         colIndex,
+				value:          value,
+				possibleValues: possibleValues,
+				row:            rowIndex,
+				column:         colIndex,
 			}
 		}
 	}
@@ -81,21 +81,21 @@ func (ss SudokuSolver) GetBoard() SudokuBoard {
 func (ss *SudokuSolver) ReducePossibleValues(cell Cell, value int) {
 	// remove from same column
 	for _, row := range ss.board {
-		if row[cell.Column].Row != cell.Row {
-			row[cell.Column].removeValue(value)
+		if row[cell.column].row != cell.row {
+			row[cell.column].removeValue(value)
 		}
 	}
 	// remove from same row
-	for i, col := range ss.board[cell.Row] {
-		if i != cell.Column {
+	for i, col := range ss.board[cell.row] {
+		if i != cell.column {
 			col.removeValue(value)
 		}
 	}
 	// remove from same subgrid
-	subRowStart, subColStart, subRowEnd, subColEnd := ss.board.getSubBoardBoundingBox(cell.Row, cell.Column)
+	subRowStart, subColStart, subRowEnd, subColEnd := ss.board.getSubBoardBoundingBox(cell.row, cell.column)
 	for r := subRowStart; r <= subRowEnd; r++ {
 		for c := subColStart; c <= subColEnd; c++ {
-			if ss.board[r][c].Row != cell.Row || ss.board[r][c].Column != cell.Column {
+			if ss.board[r][c].row != cell.row || ss.board[r][c].column != cell.column {
 				ss.board[r][c].removeValue(value)
 			}
 		}
