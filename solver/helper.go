@@ -7,10 +7,6 @@ import (
 	"strings"
 )
 
-func IsFinished(sb SudokuBoard) bool {
-	return len(sb.unsolved) == 0 && sb.isValid()
-}
-
 func DeepCopy(sb SudokuBoard) SudokuBoard {
 	newGrid := make([][]Cell, len(sb.grid))
 	for rowIndex, row := range sb.grid {

@@ -16,7 +16,7 @@ func TestSudokuSolver(t *testing.T) {
 		ss := solver.NewSudokuSolver(inputTestGrids[i])
 		output := ss.Solve()
 		sb := solver.NewSudokuBoard(solver.ConvertBoardToCells(output))
-		if !solver.IsFinished(sb) {
+		if !sb.IsSolved() {
 			t.Errorf("%v is not a valid answer", output)
 		}
 	}

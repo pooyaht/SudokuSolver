@@ -102,6 +102,10 @@ func (sb SudokuBoard) string() string {
 	return sbStr.String()
 }
 
+func (sb SudokuBoard) IsSolved() bool {
+	return len(sb.unsolved) == 0 && sb.isValid()
+}
+
 func (sb SudokuBoard) isValid() bool {
 	size := len(sb.grid)
 	subGridSize := int(math.Sqrt(float64(size)))
