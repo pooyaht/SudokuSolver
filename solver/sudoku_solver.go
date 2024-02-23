@@ -1,103 +1,62 @@
 package solver
 
-import (
-	"math"
-)
+import "fmt"
 
 type SudokuSolver struct {
-	board    SudokuBoard
 	frontier []SudokuBoard
-	explored []SudokuBoard
-}
-
-type SudokuBoard [][]Cell
-
-type Cell struct {
-	value          int
-	possibleValues []int
-	row            int
-	column         int
-}
-
-func (c *Cell) removeValue(value int) {
-	for i, v := range c.possibleValues {
-		if v == value {
-			c.possibleValues = append(c.possibleValues[:i], c.possibleValues[i+1:]...)
-			break
-		}
-	}
-}
-
-func (sb SudokuBoard) getSubBoardBoundingBox(row int, column int) (int, int, int, int) {
-	n := len(sb)
-	subBoardSize := int(math.Sqrt(float64(n)))
-
-	subRowStart := (row / subBoardSize) * subBoardSize
-	subColStart := (column / subBoardSize) * subBoardSize
-	subRowEnd := subRowStart + subBoardSize - 1
-	subColEnd := subColStart + subBoardSize - 1
-
-	return subRowStart, subColStart, subRowEnd, subColEnd
+	explored map[string]bool
 }
 
 func NewSudokuSolver(board [][]int) SudokuSolver {
-	sb := convertBoardToCells(board)
+	cells := ConvertBoardToCells(board)
+	sb := NewSudokuBoard(cells)
 	return SudokuSolver{
-		board: sb,
 		frontier: []SudokuBoard{
 			sb,
 		},
-		explored: []SudokuBoard{},
+		explored: make(map[string]bool),
 	}
 }
 
-func convertBoardToCells(board [][]int) SudokuBoard {
-	sudokuBoard := make(SudokuBoard, len(board))
-	for rowIndex, row := range board {
-		sudokuBoard[rowIndex] = make([]Cell, len(row))
-		for colIndex, value := range row {
-			var possibleValues []int
-			if value == 0 {
-				possibleValues = make([]int, len(board))
-				for i := 1; i <= len(board); i++ {
-					possibleValues[i-1] = i
-				}
-			}
-			sudokuBoard[rowIndex][colIndex] = Cell{
-				value:          value,
-				possibleValues: possibleValues,
-				row:            rowIndex,
-				column:         colIndex,
+func (ss *SudokuSolver) Solve() [][]int {
+	for len(ss.frontier) > 0 {
+		currentBoard := ss.frontier[len(ss.frontier)-1]
+		ss.frontier = ss.frontier[:len(ss.frontier)-1]
+
+		currentBoardStr := currentBoard.string()
+		if ss.explored[currentBoardStr] {
+			continue
+		}
+		ss.explored[currentBoardStr] = true
+
+		if len(currentBoard.unsolved) == 0 {
+			fmt.Println(currentBoard.toArray())
+			return currentBoard.toArray()
+		}
+
+		index := ss.selectCellWithFewestPossibleValues(currentBoard)
+		cell := currentBoard.grid[index.row][index.column]
+		for _, value := range cell.possibleValues {
+			newBoard := DeepCopy(currentBoard)
+			newBoard.grid[index.row][index.column].value = value
+			delete(newBoard.unsolved, index)
+			newBoard.reducePossibleValues(index, value)
+			if newBoard.isValid() {
+				ss.frontier = append(ss.frontier, newBoard)
 			}
 		}
 	}
-	return sudokuBoard
+	return nil
 }
 
-func (ss SudokuSolver) GetBoard() SudokuBoard {
-	return ss.board
-}
-
-func (ss *SudokuSolver) reducePossibleValues(cell Cell, value int) {
-	// remove from same column
-	for _, row := range ss.board {
-		if row[cell.column].row != cell.row {
-			row[cell.column].removeValue(value)
+func (ss *SudokuSolver) selectCellWithFewestPossibleValues(board SudokuBoard) Index {
+	minPossibleValues := -1
+	var minIndex Index
+	for index, cell := range board.unsolved {
+		if len(cell.possibleValues) < minPossibleValues || minPossibleValues == -1 {
+			minPossibleValues = len(cell.possibleValues)
+			minIndex = index
 		}
 	}
-	// remove from same row
-	for i, col := range ss.board[cell.row] {
-		if i != cell.column {
-			col.removeValue(value)
-		}
-	}
-	// remove from same subgrid
-	subRowStart, subColStart, subRowEnd, subColEnd := ss.board.getSubBoardBoundingBox(cell.row, cell.column)
-	for r := subRowStart; r <= subRowEnd; r++ {
-		for c := subColStart; c <= subColEnd; c++ {
-			if ss.board[r][c].row != cell.row || ss.board[r][c].column != cell.column {
-				ss.board[r][c].removeValue(value)
-			}
-		}
-	}
+	return minIndex
 }
