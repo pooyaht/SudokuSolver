@@ -157,3 +157,15 @@ func (sb SudokuBoard) isValid() bool {
 
 	return true
 }
+
+func (sb SudokuBoard) selectCellWithFewestPossibleValues() Index {
+	minPossibleValues := len(sb.grid) + 1
+	var minIndex Index
+	for index, cell := range sb.unsolved {
+		if len(cell.possibleValues) < minPossibleValues {
+			minPossibleValues = len(cell.possibleValues)
+			minIndex = index
+		}
+	}
+	return minIndex
+}

@@ -34,7 +34,7 @@ func (ss *SudokuSolver) Solve() [][]int {
 			return currentBoard.toArray()
 		}
 
-		index := ss.selectCellWithFewestPossibleValues(currentBoard)
+		index := currentBoard.selectCellWithFewestPossibleValues()
 		cell := currentBoard.grid[index.row][index.column]
 		for _, value := range cell.possibleValues {
 			newBoard := DeepCopy(currentBoard)
@@ -47,16 +47,4 @@ func (ss *SudokuSolver) Solve() [][]int {
 		}
 	}
 	return nil
-}
-
-func (ss *SudokuSolver) selectCellWithFewestPossibleValues(board SudokuBoard) Index {
-	minPossibleValues := -1
-	var minIndex Index
-	for index, cell := range board.unsolved {
-		if len(cell.possibleValues) < minPossibleValues || minPossibleValues == -1 {
-			minPossibleValues = len(cell.possibleValues)
-			minIndex = index
-		}
-	}
-	return minIndex
 }
