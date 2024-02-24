@@ -169,3 +169,15 @@ func (sb SudokuBoard) selectCellWithFewestPossibleValues() Index {
 	}
 	return minIndex
 }
+
+func (sb SudokuBoard) selectCellWithMaximumPossibleValues() Index {
+	maxPossibleValues := -1
+	var maxIndex Index
+	for index, cell := range sb.unsolved {
+		if len(cell.possibleValues) > maxPossibleValues {
+			maxPossibleValues = len(cell.possibleValues)
+			maxIndex = index
+		}
+	}
+	return maxIndex
+}
