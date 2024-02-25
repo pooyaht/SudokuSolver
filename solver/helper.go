@@ -88,7 +88,7 @@ func CalcPossibleValues(grid [][]int, index Index) []int {
 	return result
 }
 
-func ParseSudoku(sudokuString string, size int) ([][][]int, error) {
+func ParseSudoku(sudokuString string) ([][][]int, error) {
 	var grids [][][]int
 	var currentGrid [][]int
 
@@ -110,7 +110,7 @@ func ParseSudoku(sudokuString string, size int) ([][][]int, error) {
 				row[i] = 0
 			} else {
 				value, err := strconv.Atoi(cell)
-				if err != nil || value < 1 || value > size {
+				if err != nil || value < 1 || value > len(cells) {
 					return nil, fmt.Errorf("failed to parse cell value: %v", err)
 				}
 				row[i] = value
