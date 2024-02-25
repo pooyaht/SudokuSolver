@@ -31,6 +31,10 @@ func DeepCopy(sb SudokuBoard) SudokuBoard {
 }
 
 func ConvertBoardToCells(board [][]int) [][]Cell {
+	if board == nil {
+		return nil
+	}
+
 	sudokuBoard := make([][]Cell, len(board))
 	for rowIndex, row := range board {
 		sudokuBoard[rowIndex] = make([]Cell, len(row))

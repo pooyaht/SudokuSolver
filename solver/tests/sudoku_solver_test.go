@@ -17,8 +17,7 @@ func TestSudokuSolver(t *testing.T) {
 		output := ss.Solve()
 		sb := solver.NewSudokuBoard(solver.ConvertBoardToCells(output))
 		if !sb.IsSolved() {
-			t.Errorf("%v is not a valid answer", output)
+			t.Errorf("%v is not a valid answer for %v", output, inputTestGrids[i])
 		}
 	}
-
 }
