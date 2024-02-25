@@ -7,17 +7,29 @@ import (
 	solver "github.com/pooyaht/SudokuSolver/solver"
 )
 
-//go:embed sudoku_test_input.txt
-var testInput string
+//go:embed sudoku_test_input_passes.txt
+var testInputPasses string
 
-func TestSudokuSolver(t *testing.T) {
-	inputTestGrids, _ := solver.ParseSudoku(testInput, 9)
-	for i := range inputTestGrids {
-		ss := solver.NewSudokuSolver(inputTestGrids[i])
+//go:embed sudoku_test_input_fails.txt
+var testInputFails string
+
+func TestSequentialSudokuSolver(t *testing.T) {
+	solvableTestGrids, _ := solver.ParseSudoku(testInputPasses)
+	unsolvableTestGrids, _ := solver.ParseSudoku(testInputFails)
+	for i := range solvableTestGrids {
+		ss := solver.NewSequentialSudokuSolver(solvableTestGrids[i])
 		output := ss.Solve()
 		sb := solver.NewSudokuBoard(solver.ConvertBoardToCells(output))
-		if !sb.IsSolved() && i != 0 {
-			t.Errorf("%v is not a valid answer for %v", output, inputTestGrids[i])
+		if !sb.IsSolved() {
+			t.Errorf("%v is not a valid answer for %v", output, solvableTestGrids[i])
+		}
+	}
+
+	for i := range unsolvableTestGrids {
+		ss := solver.NewSequentialSudokuSolver(unsolvableTestGrids[i])
+		output := ss.Solve()
+		if output != nil {
+			t.Errorf("%v is solved but it is unsolvable", unsolvableTestGrids[i])
 		}
 	}
 }
