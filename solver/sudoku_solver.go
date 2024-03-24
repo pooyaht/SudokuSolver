@@ -65,7 +65,8 @@ func (ps *ParallelSudokuSolver) Solve() [][]int {
 		}()
 	}
 
-	for solvedBoard := range result {
+	for i := 0; i < ps.numWorkers; i++ {
+		solvedBoard := <-result
 		if solvedBoard != nil {
 			fmt.Println(solvedBoard)
 			return solvedBoard
