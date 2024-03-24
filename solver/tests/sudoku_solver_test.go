@@ -34,11 +34,11 @@ func TestSequentialSudokuSolver(t *testing.T) {
 	}
 }
 
-func TestParallelSudokuSolver(t *testing.T) {
+func TestParallelBFSSudokuSolver(t *testing.T) {
 	solvableTestGrids, _ := solver.ParseSudoku(testInputPasses)
 	unsolvableTestGrids, _ := solver.ParseSudoku(testInputFails)
 	for i := range solvableTestGrids {
-		ps := solver.NewParallelSudokuSolver(solvableTestGrids[i], 4)
+		ps := solver.NewParallelBFSSudokuSolver(solvableTestGrids[i], 4)
 		output := ps.Solve()
 		sb := solver.NewSudokuBoard(solver.ConvertBoardToCells(output))
 		if !sb.IsSolved() {
@@ -47,7 +47,7 @@ func TestParallelSudokuSolver(t *testing.T) {
 	}
 
 	for i := range unsolvableTestGrids {
-		ps := solver.NewParallelSudokuSolver(unsolvableTestGrids[i], 4)
+		ps := solver.NewParallelBFSSudokuSolver(unsolvableTestGrids[i], 4)
 		output := ps.Solve()
 		if output != nil {
 			t.Errorf("%v is solved but it is unsolvable", unsolvableTestGrids[i])

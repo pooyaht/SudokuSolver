@@ -125,3 +125,38 @@ func ParseSudoku(sudokuString string) ([][][]int, error) {
 
 	return grids, nil
 }
+
+func solveUtil(frontier *[]SudokuBoard, explored Map[string, bool]) [][]int {
+	for len(*frontier) > 0 {
+		currentBoard := (*frontier)[len(*frontier)-1]
+		*frontier = (*frontier)[:len(*frontier)-1]
+
+		currentBoardStr := currentBoard.string()
+		if _, ok := explored.Load(currentBoardStr); ok {
+			continue
+		}
+		explored.Store(currentBoardStr, true)
+
+		if len(currentBoard.unsolved) == 0 {
+			return currentBoard.toArray()
+		}
+
+		index := currentBoard.selectCellWithFewestPossibleValues()
+		frontier = extendFrontier(frontier, currentBoard, index)
+	}
+	return nil
+}
+
+func extendFrontier(frontier *[]SudokuBoard, board SudokuBoard, index Index) *[]SudokuBoard {
+	cell := board.grid[index.row][index.column]
+	for _, value := range cell.possibleValues {
+		newBoard := DeepCopy(board)
+		newBoard.grid[index.row][index.column].value = value
+		delete(newBoard.unsolved, index)
+		newBoard.reducePossibleValues(index, value)
+		if newBoard.isValid() {
+			*frontier = append(*frontier, newBoard)
+		}
+	}
+	return frontier
+}
