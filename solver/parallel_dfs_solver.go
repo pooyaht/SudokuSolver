@@ -1,7 +1,6 @@
 package solver
 
 import (
-	"fmt"
 	"sync"
 )
 
@@ -12,10 +11,10 @@ type ParallelDFSsSudokuSolver struct {
 	numWorkers   int
 }
 
-func NewParallelDFSSudokuSolver(board [][]int, numWorkers int) ParallelDFSsSudokuSolver {
+func NewParallelDFSSudokuSolver(board [][]int, numWorkers int) *ParallelDFSsSudokuSolver {
 	cells := ConvertBoardToCells(board)
 	sb := NewSudokuBoard(cells)
-	return ParallelDFSsSudokuSolver{
+	return &ParallelDFSsSudokuSolver{
 		initialBoard: sb,
 		explored:     NewConcurrentMap[string, bool](),
 		frontier:     &[]SudokuBoard{sb},
@@ -37,11 +36,9 @@ func (ps *ParallelDFSsSudokuSolver) Solve() [][]int {
 	for i := 0; i < ps.numWorkers; i++ {
 		solvedBoard := <-result
 		if solvedBoard != nil {
-			fmt.Println(solvedBoard)
 			return solvedBoard
 		}
 	}
-	fmt.Println("No solution found!")
 	return nil
 }
 

@@ -1,17 +1,15 @@
 package solver
 
-import "fmt"
-
 type ParallelBFSSudokuSolver struct {
 	initialBoard SudokuBoard
 	explored     ConcurrentMap[string, bool]
 	numWorkers   int
 }
 
-func NewParallelBFSSudokuSolver(board [][]int, numWorkers int) ParallelBFSSudokuSolver {
+func NewParallelBFSSudokuSolver(board [][]int, numWorkers int) *ParallelBFSSudokuSolver {
 	cells := ConvertBoardToCells(board)
 	sb := NewSudokuBoard(cells)
-	return ParallelBFSSudokuSolver{
+	return &ParallelBFSSudokuSolver{
 		initialBoard: sb,
 		explored:     NewConcurrentMap[string, bool](),
 		numWorkers:   numWorkers,
@@ -40,10 +38,8 @@ func (ps *ParallelBFSSudokuSolver) Solve() [][]int {
 	for i := 0; i < ps.numWorkers; i++ {
 		solvedBoard := <-result
 		if solvedBoard != nil {
-			fmt.Println(solvedBoard)
 			return solvedBoard
 		}
 	}
-	fmt.Println("No solution found!")
 	return nil
 }
